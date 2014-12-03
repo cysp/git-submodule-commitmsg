@@ -1,0 +1,5 @@
+[package]
+
+name = "git-submodule-commitmsg-rs"
+version = "0.0.1"
+authors = ["Scott Talbot <s@chikachow.org>"]
