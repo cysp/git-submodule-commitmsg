@@ -75,15 +75,28 @@ impl<'a> SubmoduleUpdate<'a> {
       Err(_) => return None,
     };
 
-    let rw = match r.new_revwalk() {
+    let added_walk = match r.new_revwalk() {
       Ok(rw) => rw,
       Err(_) => return None,
     };
-    rw.hide(&current_id);
-    rw.push(&new_id);
+    added_walk.set_sorting(git2::SORT_TOPOLOGICAL);
+    added_walk.hide(&current_id);
+    added_walk.push(&new_id);
 
-    for oid in rw.oid_iter() {
+    for oid in added_walk.oid_iter() {
       println!("+{}", oid);
+    }
+
+    let dropped_walk = match r.new_revwalk() {
+      Ok(rw) => rw,
+      Err(_) => return None,
+    };
+    dropped_walk.set_sorting(git2::SORT_TOPOLOGICAL);
+    dropped_walk.hide(&new_id);
+    dropped_walk.push(&current_id);
+
+    for oid in dropped_walk.oid_iter() {
+      println!("-{}", oid);
     }
 
     Some(SubmoduleUpdate{ submodule: submodule, title: title })
