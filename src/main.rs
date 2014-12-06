@@ -108,7 +108,7 @@ impl<'a> SubmoduleUpdate<'a> {
       let _ = added_walk.hide(&current_id);
       let _ = added_walk.push(&new_id);
 
-      for oid in added_walk.oid_iter() {
+      for oid in added_walk.oids() {
         m.push('\n');
         m.push('+');
         m.push_str(&*oid.as_bytes()[0..4].to_hex());
@@ -135,7 +135,7 @@ impl<'a> SubmoduleUpdate<'a> {
       let _ = dropped_walk.hide(&new_id);
       let _ = dropped_walk.push(&current_id);
 
-      for oid in dropped_walk.oid_iter() {
+      for oid in dropped_walk.oids() {
         have_dropped_revs = true;
         m.push('\n');
         m.push('-');
