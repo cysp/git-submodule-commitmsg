@@ -11,7 +11,7 @@ use serialize::hex::{ToHex};
 fn main() {
   let mut args = std::os::args();
   let argv0 = args.remove(0);
-  // let filenames = args;
+  let filenames = args;
 
   let p = Path::new(".");
   let r: git2::Repository = match git2::Repository::discover(&p) {
@@ -33,6 +33,11 @@ fn main() {
   };
 
   let submodule_updates: Vec<SubmoduleUpdate> = submodules.iter().filter_map(|submodule| {
+    let path = submodule.path();
+    let name = String::from_str(path.as_str().or(submodule.name()).unwrap_or(""));
+    if filenames.len() > 0 && !filenames.contains(&name) {
+      return None;
+    }
     SubmoduleUpdate::from_submodule(submodule)
   }).collect();
 
