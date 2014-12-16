@@ -49,6 +49,10 @@ fn main() {
     title.push_str(&**title_component);
   }
 
+  if submodule_updates.len() == 0 {
+    return;
+  }
+
   println!("Update {}", title);
 
   for submodule in submodule_updates.iter() {
