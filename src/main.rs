@@ -54,13 +54,13 @@ fn main() {
     }
 
     println!("Update {}", title);
-    println!("");
 
-    let multiple_updates = submodule_updates.len() > 0;
+    let multiple_updates = submodule_updates.len() > 1;
 
     for submodule in submodule_updates.iter() {
         match submodule.get_message() {
             Some(message) => {
+                println!("");
                 if multiple_updates {
                     println!("{}:", submodule.get_name());
                 }
@@ -111,17 +111,18 @@ impl<'a> SubmoduleUpdate<'a> {
         let mut have_dropped_revs: bool = false;
 
         if let Ok(r) = git2::Repository::open(&path) {
-            let mut m = String::new();
+            let mut message_lines = std::vec::Vec::<String>::new();
 
             let mut walk = match r.revwalk() {
                 Ok(rw) => rw,
                 Err(_) => return None,
             };
             walk.set_sorting(git2::SORT_TOPOLOGICAL);
+
             let _ = walk.hide(&current_id);
             let _ = walk.push(&new_id);
-
             for oid in walk {
+                let mut m = String::new();
                 m.push('+');
                 m.push_str(&*oid.as_bytes()[0..4].to_hex());
                 match r.find_commit(oid) {
@@ -137,14 +138,15 @@ impl<'a> SubmoduleUpdate<'a> {
                     },
                     Err(_) => (),
                 }
-                m.push('\n');
+                message_lines.push(m);
             }
 
+            // libgit2 bug requires setting sort again
             walk.set_sorting(git2::SORT_TOPOLOGICAL);
             let _ = walk.hide(&new_id);
             let _ = walk.push(&current_id);
-
             for oid in walk {
+                let mut m = String::new();
                 have_dropped_revs = true;
                 m.push('-');
                 m.push_str(&*oid.as_bytes()[0..4].to_hex());
@@ -161,14 +163,14 @@ impl<'a> SubmoduleUpdate<'a> {
                     },
                     Err(_) => (),
                 }
-                m.push('\n');
+                message_lines.push(m);
             }
 
             if have_dropped_revs {
                 title_change_separator = "...";
             }
 
-            message = Some(m);
+            message = Some(message_lines.connect("\n"));
         }
 
         let title = format!("{} ({}{}{})", name.clone(), id_from_str, title_change_separator, id_to_str);
