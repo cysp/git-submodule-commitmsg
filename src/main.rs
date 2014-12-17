@@ -108,7 +108,7 @@ impl<'a> SubmoduleUpdate<'a> {
       m.push_str(&*name);
       m.push_str(":");
 
-      let added_walk = match r.new_revwalk() {
+      let mut added_walk = match r.revwalk() {
         Ok(rw) => rw,
         Err(_) => return None,
       };
@@ -116,7 +116,7 @@ impl<'a> SubmoduleUpdate<'a> {
       let _ = added_walk.hide(&current_id);
       let _ = added_walk.push(&new_id);
 
-      for oid in added_walk.oids() {
+      for oid in added_walk {
         m.push('\n');
         m.push('+');
         m.push_str(&*oid.as_bytes()[0..4].to_hex());
@@ -135,7 +135,7 @@ impl<'a> SubmoduleUpdate<'a> {
         }
       }
 
-      let dropped_walk = match r.new_revwalk() {
+      let mut dropped_walk = match r.revwalk() {
         Ok(rw) => rw,
         Err(_) => return None,
       };
@@ -143,7 +143,7 @@ impl<'a> SubmoduleUpdate<'a> {
       let _ = dropped_walk.hide(&new_id);
       let _ = dropped_walk.push(&current_id);
 
-      for oid in dropped_walk.oids() {
+      for oid in dropped_walk {
         have_dropped_revs = true;
         m.push('\n');
         m.push('-');
