@@ -119,8 +119,8 @@ impl<'a> SubmoduleUpdate<'a> {
             };
             walk.set_sorting(git2::SORT_TOPOLOGICAL);
 
-            let _ = walk.hide(&current_id);
-            let _ = walk.push(&new_id);
+            let _ = walk.hide(current_id);
+            let _ = walk.push(new_id);
             for oid in walk {
                 let mut m = String::new();
                 m.push('+');
@@ -143,8 +143,8 @@ impl<'a> SubmoduleUpdate<'a> {
 
             // libgit2 bug requires setting sort again
             walk.set_sorting(git2::SORT_TOPOLOGICAL);
-            let _ = walk.hide(&new_id);
-            let _ = walk.push(&current_id);
+            let _ = walk.hide(new_id);
+            let _ = walk.push(current_id);
             for oid in walk {
                 let mut m = String::new();
                 have_dropped_revs = true;
