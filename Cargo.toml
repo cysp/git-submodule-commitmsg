@@ -3,6 +3,9 @@ name = "git-submodule-commitmsg-rs"
 version = "0.0.1"
 authors = ["Scott Talbot <s@chikachow.org>"]
 
+[dependencies]
+rustc-serialize = "*"
+
 [dependencies.git2]
 git = "https://github.com/alexcrichton/git2-rs"
 #path = "lib/git2-rs"

@@ -1,14 +1,14 @@
-#![feature(slicing_syntax)]
+#![feature(collections)]
 
-extern crate collections;
-extern crate serialize;
 extern crate git2;
+extern crate rustc_serialize as serialize;
 
+use std::io::Write;
+use std::path::{Path};
 use serialize::hex::{ToHex};
 
-
 fn main() {
-    let mut args = std::os::args();
+    let mut args: std::vec::Vec<String> = std::env::args().collect();
     let argv0 = args.remove(0);
     let filenames = args;
 
@@ -16,24 +16,22 @@ fn main() {
     let r: git2::Repository = match git2::Repository::discover(&p) {
         Ok(r) => r,
         Err(e) => {
-            std::os::set_exit_status(1);
             let _ = writeln!(&mut std::io::stderr(), "{}: no repository found: {}", argv0, e);
-            return;
+            return std::process::exit(1);
         },
     };
 
     let submodules = match r.submodules() {
         Ok(submodules) => submodules,
         Err(e) => {
-            std::os::set_exit_status(1);
             let _ = writeln!(&mut std::io::stderr(), "{}: failed to enumerate submodules: {}", argv0, e);
-            return;
+            return std::process::exit(1);
         }
     };
 
     let submodule_updates: Vec<SubmoduleUpdate> = submodules.iter().filter_map(|submodule| {
         let path = submodule.path();
-        let name = String::from_str(path.as_str().or(submodule.name()).unwrap_or(""));
+        let name = String::from_str(path.to_str().or(submodule.name()).unwrap_or(""));
         if filenames.len() > 0 && !filenames.contains(&name) {
             return None;
         }
@@ -72,17 +70,17 @@ fn main() {
 }
 
 
-#[deriving(Show)]
-struct SubmoduleUpdate<'a> {
-    name: collections::string::String,
-    title: collections::string::String,
-    message: Option<collections::string::String>,
+#[derive(Debug)]
+struct SubmoduleUpdate {
+    name: std::string::String,
+    title: std::string::String,
+    message: Option<std::string::String>,
 }
 
-impl<'a> SubmoduleUpdate<'a> {
-    pub fn from_submodule(submodule: &'a git2::Submodule) -> Option<SubmoduleUpdate<'a>> {
+impl<'a> SubmoduleUpdate {
+    pub fn from_submodule(submodule: &'a git2::Submodule) -> Option<SubmoduleUpdate> {
         let path = submodule.path();
-        let name = String::from_str(path.as_str().or(submodule.name()).unwrap_or("???"));
+        let name = String::from_str(path.to_str().or(submodule.name()).unwrap_or("???"));
 
         let current_id = match submodule.head_id() {
             Some(id) => id,
@@ -141,8 +139,12 @@ impl<'a> SubmoduleUpdate<'a> {
                 message_lines.push(m);
             }
 
-            // libgit2 bug requires setting sort again
+            let mut walk = match r.revwalk() {
+                Ok(rw) => rw,
+                Err(_) => return None,
+            };
             walk.set_sorting(git2::SORT_TOPOLOGICAL);
+
             let _ = walk.hide(new_id);
             let _ = walk.push(current_id);
             for oid in walk {
@@ -178,15 +180,15 @@ impl<'a> SubmoduleUpdate<'a> {
         Some(SubmoduleUpdate{ name: name, title: title, message: message })
     }
 
-    pub fn get_name(&self) -> &collections::string::String {
+    pub fn get_name(&self) -> &std::string::String {
         &self.name
     }
 
-    pub fn get_title(&self) -> &collections::string::String {
+    pub fn get_title(&self) -> &std::string::String {
         &self.title
     }
 
-    pub fn get_message(&self) -> Option<collections::string::String> {
+    pub fn get_message(&self) -> Option<std::string::String> {
         self.message.clone()
     }
 }
