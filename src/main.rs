@@ -8,9 +8,9 @@ use std::path::{Path};
 use serialize::hex::{ToHex};
 
 fn main() {
-    let mut args: std::vec::Vec<String> = std::env::args().collect();
-    let argv0 = args.remove(0);
-    let filenames = args;
+    let mut args = std::env::args();
+    let argv0 = args.next().unwrap_or(String::new());
+    let filenames = args.collect::<Vec<String>>();
 
     let p = Path::new(".");
     let r: git2::Repository = match git2::Repository::discover(&p) {
