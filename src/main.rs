@@ -1,5 +1,3 @@
-#![feature(collections)]
-
 extern crate git2;
 extern crate rustc_serialize as serialize;
 
@@ -31,7 +29,7 @@ fn main() {
 
     let submodule_updates: Vec<SubmoduleUpdate> = submodules.iter().filter_map(|submodule| {
         let path = submodule.path();
-        let name = String::from_str(path.to_str().or(submodule.name()).unwrap_or(""));
+        let name = path.to_str().or(submodule.name()).unwrap_or("").to_owned();
         if filenames.len() > 0 && !filenames.contains(&name) {
             return None;
         }
@@ -80,7 +78,7 @@ struct SubmoduleUpdate {
 impl<'a> SubmoduleUpdate {
     pub fn from_submodule(submodule: &'a git2::Submodule) -> Option<SubmoduleUpdate> {
         let path = submodule.path();
-        let name = String::from_str(path.to_str().or(submodule.name()).unwrap_or("???"));
+        let name = path.to_str().or(submodule.name()).unwrap_or("???").to_owned();
 
         let current_id = match submodule.head_id() {
             Some(id) => id,
@@ -97,11 +95,11 @@ impl<'a> SubmoduleUpdate {
 
         let id_from_str = match submodule.head_id() {
             Some(id) => id.as_bytes()[0..4].to_hex(),
-            None => String::from_str("????????"),
+            None => "????????".to_owned(),
         };
         let id_to_str = match submodule.workdir_id() {
             Some(id) => id.as_bytes()[0..4].to_hex(),
-            None => String::from_str("????????"),
+            None => "????????".to_owned(),
         };
 
         let mut title_change_separator = "..";
@@ -172,7 +170,7 @@ impl<'a> SubmoduleUpdate {
                 title_change_separator = "...";
             }
 
-            message = Some(message_lines.connect("\n"));
+            message = Some(message_lines.join("\n"));
         }
 
         let title = format!("{} ({}{}{})", name.clone(), id_from_str, title_change_separator, id_to_str);
