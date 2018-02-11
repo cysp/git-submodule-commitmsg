@@ -1,9 +1,7 @@
 extern crate git2;
-extern crate rustc_serialize as serialize;
 
 use std::io::Write;
 use std::path::{Path};
-use serialize::hex::{ToHex};
 
 fn main() {
     let mut args = std::env::args();
@@ -15,7 +13,7 @@ fn main() {
         Ok(r) => r,
         Err(e) => {
             let _ = writeln!(&mut std::io::stderr(), "{}: no repository found: {}", argv0, e);
-            return std::process::exit(1);
+            std::process::exit(1);
         },
     };
 
@@ -23,7 +21,7 @@ fn main() {
         Ok(submodules) => submodules,
         Err(e) => {
             let _ = writeln!(&mut std::io::stderr(), "{}: failed to enumerate submodules: {}", argv0, e);
-            return std::process::exit(1);
+            std::process::exit(1);
         }
     };
 
@@ -94,11 +92,11 @@ impl<'a> SubmoduleUpdate {
         }
 
         let id_from_str = match submodule.head_id() {
-            Some(id) => id.as_bytes()[0..4].to_hex(),
+            Some(id) => format!("{}", id)[0..7].to_owned(),
             None => "????????".to_owned(),
         };
         let id_to_str = match submodule.workdir_id() {
-            Some(id) => id.as_bytes()[0..4].to_hex(),
+            Some(id) => format!("{}", id)[0..7].to_owned(),
             None => "????????".to_owned(),
         };
 
@@ -118,9 +116,13 @@ impl<'a> SubmoduleUpdate {
             let _ = walk.hide(current_id);
             let _ = walk.push(new_id);
             for oid in walk {
+                let oid = match oid {
+                    Ok(o) => o,
+                    Err(_) => continue,
+                };
                 let mut m = String::new();
                 m.push('+');
-                m.push_str(&*oid.as_bytes()[0..4].to_hex());
+                m.push_str(&format!("{}", oid)[0..7]);
                 match r.find_commit(oid) {
                     Ok(c) => match c.message() {
                         Some(cm) => match cm.split('\n').nth(0) {
@@ -146,10 +148,14 @@ impl<'a> SubmoduleUpdate {
             let _ = walk.hide(new_id);
             let _ = walk.push(current_id);
             for oid in walk {
+                let oid = match oid {
+                    Ok(o) => o,
+                    Err(_) => continue,
+                };
                 let mut m = String::new();
                 have_dropped_revs = true;
                 m.push('-');
-                m.push_str(&*oid.as_bytes()[0..4].to_hex());
+                m.push_str(&format!("{}", oid)[0..7]);
                 match r.find_commit(oid) {
                     Ok(c) => match c.message() {
                         Some(cm) => match cm.split('\n').nth(0) {
