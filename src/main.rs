@@ -111,7 +111,7 @@ impl<'a> SubmoduleUpdate {
                 Ok(rw) => rw,
                 Err(_) => return None,
             };
-            walk.set_sorting(git2::SORT_TOPOLOGICAL);
+            walk.set_sorting(git2::Sort::TOPOLOGICAL);
 
             let _ = walk.hide(current_id);
             let _ = walk.push(new_id);
@@ -143,7 +143,7 @@ impl<'a> SubmoduleUpdate {
                 Ok(rw) => rw,
                 Err(_) => return None,
             };
-            walk.set_sorting(git2::SORT_TOPOLOGICAL);
+            walk.set_sorting(git2::Sort::TOPOLOGICAL);
 
             let _ = walk.hide(new_id);
             let _ = walk.push(current_id);
