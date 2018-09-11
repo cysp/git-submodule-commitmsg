@@ -78,6 +78,11 @@ impl<'a> SubmoduleUpdate {
         let path = submodule.path();
         let name = path.to_str().or(submodule.name()).unwrap_or("???").to_owned();
 
+        let submodule_repo = match submodule.open() {
+            Ok(repo) => repo,
+            Err(_) => return None,
+        };
+
         let current_id = match submodule.head_id() {
             Some(id) => id,
             None => return None,
@@ -91,14 +96,15 @@ impl<'a> SubmoduleUpdate {
             return None;
         }
 
-        let id_from_str = match submodule.head_id() {
-            Some(id) => format!("{}", id)[0..7].to_owned(),
-            None => "????????".to_owned(),
-        };
-        let id_to_str = match submodule.workdir_id() {
-            Some(id) => format!("{}", id)[0..7].to_owned(),
-            None => "????????".to_owned(),
-        };
+        fn short_id_for_commit_in_repo(repo: &git2::Repository, oid: git2::Oid) -> Option<String> {
+            repo.find_object(oid, Some(git2::ObjectType::Commit))
+                .and_then(|commit| commit.short_id())
+                .ok()
+                .and_then(|commit_id| commit_id.as_str().map(|id| id.to_owned()))
+        }
+
+        let id_from_str = short_id_for_commit_in_repo(&submodule_repo, current_id).unwrap_or("???????".to_owned());
+        let id_to_str = short_id_for_commit_in_repo(&submodule_repo, new_id).unwrap_or("???????".to_owned());
 
         let mut title_change_separator = "..";
         let mut message: Option<String> = None;
