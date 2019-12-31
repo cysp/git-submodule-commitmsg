@@ -135,3 +135,51 @@ fn test_degenerate() {
     assert_eq!(update.title, "name (from..to)");
     assert_eq!(update.message, None);
 }
+
+#[test]
+fn test_adding_one_commit() {
+    let update = SubmoduleUpdate::new(
+        "name",
+        "from",
+        "to",
+        vec![SubmoduleCommit::new("0000000", "commit")],
+        vec![],
+    );
+
+    assert_eq!(update.name, "name");
+    assert_eq!(update.title, "name (from..to)");
+    assert_eq!(update.message, Some("+0000000 commit".to_owned()));
+}
+
+#[test]
+fn test_dropping_one_commit() {
+    let update = SubmoduleUpdate::new(
+        "name",
+        "from",
+        "to",
+        vec![],
+        vec![SubmoduleCommit::new("0000000", "commit")],
+    );
+
+    assert_eq!(update.name, "name");
+    assert_eq!(update.title, "name (from...to)");
+    assert_eq!(update.message, Some("-0000000 commit".to_owned()));
+}
+
+#[test]
+fn test_adding_and_dropping_one_commit() {
+    let update = SubmoduleUpdate::new(
+        "name",
+        "from",
+        "to",
+        vec![SubmoduleCommit::new("0000000", "commit")],
+        vec![SubmoduleCommit::new("0000000", "commit")],
+    );
+
+    assert_eq!(update.name, "name");
+    assert_eq!(update.title, "name (from...to)");
+    assert_eq!(
+        update.message,
+        Some("+0000000 commit\n-0000000 commit".to_owned())
+    );
+}
