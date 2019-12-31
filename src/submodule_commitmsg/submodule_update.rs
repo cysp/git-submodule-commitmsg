@@ -126,3 +126,12 @@ impl<'a> SubmoduleUpdate {
         ))
     }
 }
+
+#[test]
+fn test_degenerate() {
+    let update = SubmoduleUpdate::new("name", "from", "to", vec![], vec![]);
+
+    assert_eq!(update.name, "name");
+    assert_eq!(update.title, "name (from..to)");
+    assert_eq!(update.message, None);
+}
