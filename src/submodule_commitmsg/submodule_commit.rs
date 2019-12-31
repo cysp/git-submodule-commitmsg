@@ -7,10 +7,13 @@ pub struct SubmoduleCommit {
 }
 
 impl SubmoduleCommit {
-    pub fn new(id: &str, title: Option<std::string::String>) -> SubmoduleCommit {
+    pub fn new<TId: Into<String>, TTitle: Into<String>>(
+        id: TId,
+        title: Option<TTitle>,
+    ) -> SubmoduleCommit {
         SubmoduleCommit {
-            id: id.to_owned(),
-            title: title,
+            id: id.into(),
+            title: title.map(|title| title.into()),
         }
     }
 
