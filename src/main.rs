@@ -55,11 +55,11 @@ fn main() {
 
     let mut title = String::new();
     for submodule in submodule_updates.iter() {
-        let title_component = submodule.get_title();
+        let title_component = &submodule.title;
         if !title.is_empty() {
             title.push_str(", ");
         }
-        title.push_str(&**title_component);
+        title.push_str(&title_component);
     }
 
     println!("Update {}", title);
@@ -67,11 +67,11 @@ fn main() {
     let multiple_updates = submodule_updates.len() > 1;
 
     for submodule in submodule_updates.iter() {
-        match submodule.get_message() {
+        match &submodule.message {
             Some(message) => {
                 println!("");
                 if multiple_updates {
-                    println!("{}:", submodule.get_name());
+                    println!("{}:", submodule.name);
                 }
                 println!("{}", message)
             }
