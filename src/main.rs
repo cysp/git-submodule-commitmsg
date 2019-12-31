@@ -124,7 +124,6 @@ impl<'a> SubmoduleUpdate {
         let id_to_str =
             short_id_for_commit_in_repo(&submodule_repo, new_id).unwrap_or("???????".to_owned());
 
-        let mut title_change_separator = "..";
         let mut message: Option<String> = None;
         let mut have_dropped_revs: bool = false;
 
@@ -199,12 +198,10 @@ impl<'a> SubmoduleUpdate {
                 message_lines.push(m);
             }
 
-            if have_dropped_revs {
-                title_change_separator = "...";
-            }
-
             message = Some(message_lines.join("\n"));
         }
+
+        let title_change_separator = if have_dropped_revs { "..." } else { ".." };
 
         let title = format!(
             "{} ({}{}{})",
