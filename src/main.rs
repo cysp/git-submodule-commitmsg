@@ -47,14 +47,14 @@ fn main() {
         })
         .collect();
 
-    if submodule_updates.len() == 0 {
+    if submodule_updates.is_empty() {
         return;
     }
 
     let mut title = String::new();
     for submodule in submodule_updates.iter() {
         let title_component = submodule.get_title();
-        if title.len() > 0 {
+        if !title.is_empty() {
             title.push_str(", ");
         }
         title.push_str(&**title_component);
