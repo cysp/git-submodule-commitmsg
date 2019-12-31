@@ -11,8 +11,11 @@ jobs:
 
       - uses: actions/checkout@v1
 
-      - name: Build
+      - name: rustfmt
+        run: .ci-scripts/rustfmt-check
+
+      - name: build
         run: cargo build --verbose
 
-      - name: Run tests
+      - name: test
         run: cargo test --verbose

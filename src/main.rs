@@ -1,7 +1,7 @@
 extern crate git2;
 
 use std::io::Write;
-use std::path::{Path};
+use std::path::Path;
 
 fn main() {
     let mut args = std::env::args();
@@ -12,27 +12,40 @@ fn main() {
     let r: git2::Repository = match git2::Repository::discover(&p) {
         Ok(r) => r,
         Err(e) => {
-            let _ = writeln!(&mut std::io::stderr(), "{}: no repository found: {}", argv0, e);
+            let _ = writeln!(
+                &mut std::io::stderr(),
+                "{}: no repository found: {}",
+                argv0,
+                e
+            );
             std::process::exit(1);
-        },
+        }
     };
 
     let submodules = match r.submodules() {
         Ok(submodules) => submodules,
         Err(e) => {
-            let _ = writeln!(&mut std::io::stderr(), "{}: failed to enumerate submodules: {}", argv0, e);
+            let _ = writeln!(
+                &mut std::io::stderr(),
+                "{}: failed to enumerate submodules: {}",
+                argv0,
+                e
+            );
             std::process::exit(1);
         }
     };
 
-    let submodule_updates: Vec<SubmoduleUpdate> = submodules.iter().filter_map(|submodule| {
-        let path = submodule.path();
-        let name = path.to_str().or(submodule.name()).unwrap_or("").to_owned();
-        if filenames.len() > 0 && !filenames.contains(&name) {
-            return None;
-        }
-        SubmoduleUpdate::from_submodule(submodule)
-    }).collect();
+    let submodule_updates: Vec<SubmoduleUpdate> = submodules
+        .iter()
+        .filter_map(|submodule| {
+            let path = submodule.path();
+            let name = path.to_str().or(submodule.name()).unwrap_or("").to_owned();
+            if filenames.len() > 0 && !filenames.contains(&name) {
+                return None;
+            }
+            SubmoduleUpdate::from_submodule(submodule)
+        })
+        .collect();
 
     let mut title = String::new();
     for submodule in submodule_updates.iter() {
@@ -59,12 +72,11 @@ fn main() {
                     println!("{}:", submodule.get_name());
                 }
                 println!("{}", message)
-            },
+            }
             None => (),
         }
     }
 }
-
 
 #[derive(Debug)]
 struct SubmoduleUpdate {
@@ -76,7 +88,11 @@ struct SubmoduleUpdate {
 impl<'a> SubmoduleUpdate {
     pub fn from_submodule(submodule: &'a git2::Submodule) -> Option<SubmoduleUpdate> {
         let path = submodule.path();
-        let name = path.to_str().or(submodule.name()).unwrap_or("???").to_owned();
+        let name = path
+            .to_str()
+            .or(submodule.name())
+            .unwrap_or("???")
+            .to_owned();
 
         let submodule_repo = match submodule.open() {
             Ok(repo) => repo,
@@ -103,8 +119,10 @@ impl<'a> SubmoduleUpdate {
                 .and_then(|commit_id| commit_id.as_str().map(|id| id.to_owned()))
         }
 
-        let id_from_str = short_id_for_commit_in_repo(&submodule_repo, current_id).unwrap_or("???????".to_owned());
-        let id_to_str = short_id_for_commit_in_repo(&submodule_repo, new_id).unwrap_or("???????".to_owned());
+        let id_from_str = short_id_for_commit_in_repo(&submodule_repo, current_id)
+            .unwrap_or("???????".to_owned());
+        let id_to_str =
+            short_id_for_commit_in_repo(&submodule_repo, new_id).unwrap_or("???????".to_owned());
 
         let mut title_change_separator = "..";
         let mut message: Option<String> = None;
@@ -135,7 +153,7 @@ impl<'a> SubmoduleUpdate {
                             Some(ct) => {
                                 m.push(' ');
                                 m.push_str(ct);
-                            },
+                            }
                             None => (),
                         },
                         None => (),
@@ -168,7 +186,7 @@ impl<'a> SubmoduleUpdate {
                             Some(ct) => {
                                 m.push(' ');
                                 m.push_str(ct);
-                            },
+                            }
                             None => (),
                         },
                         None => (),
@@ -185,9 +203,19 @@ impl<'a> SubmoduleUpdate {
             message = Some(message_lines.join("\n"));
         }
 
-        let title = format!("{} ({}{}{})", name.clone(), id_from_str, title_change_separator, id_to_str);
+        let title = format!(
+            "{} ({}{}{})",
+            name.clone(),
+            id_from_str,
+            title_change_separator,
+            id_to_str
+        );
 
-        Some(SubmoduleUpdate{ name: name, title: title, message: message })
+        Some(SubmoduleUpdate {
+            name: name,
+            title: title,
+            message: message,
+        })
     }
 
     pub fn get_name(&self) -> &std::string::String {
