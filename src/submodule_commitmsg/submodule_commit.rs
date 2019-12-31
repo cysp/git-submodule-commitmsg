@@ -17,6 +17,8 @@ impl SubmoduleCommit {
         r: &git2::Repository,
         oid: git2::Oid,
     ) -> Result<SubmoduleCommit, git2::Error> {
+        let id = short_id_for_commit_in_repo(r, oid)?;
+
         let title = match r.find_commit(oid)?.message() {
             Some(cm) => match cm.split('\n').nth(0) {
                 Some(ct) => ct,
@@ -26,9 +28,6 @@ impl SubmoduleCommit {
             None => return Err(git2::Error::from_str("")),
         };
 
-        Ok(SubmoduleCommit {
-            id: short_id_for_commit_in_repo(r, oid)?,
-            title: title,
-        })
+        Ok(SubmoduleCommit::new(&id, &title))
     }
 }
