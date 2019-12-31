@@ -144,9 +144,10 @@ impl<'a> SubmoduleUpdate {
                     Ok(o) => o,
                     Err(_) => continue,
                 };
+
                 let mut m = String::new();
-                m.push('+');
-                m.push_str(&format!("{}", oid)[0..7]);
+                m.push_str(&format!("+{}", oid)[0..1 + 7]);
+
                 match r.find_commit(oid) {
                     Ok(c) => match c.message() {
                         Some(cm) => match cm.split('\n').nth(0) {
@@ -176,10 +177,12 @@ impl<'a> SubmoduleUpdate {
                     Ok(o) => o,
                     Err(_) => continue,
                 };
-                let mut m = String::new();
+
                 have_dropped_revs = true;
-                m.push('-');
-                m.push_str(&format!("{}", oid)[0..7]);
+
+                let mut m = String::new();
+                m.push_str(&format!("-{}", oid)[0..1 + 7]);
+
                 match r.find_commit(oid) {
                     Ok(c) => match c.message() {
                         Some(cm) => match cm.split('\n').nth(0) {
