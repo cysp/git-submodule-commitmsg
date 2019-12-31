@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "git-submodule-commitmsg-rs"
+name = "git-submodule-commitmsg"
 version = "0.0.1"
 dependencies = [
  "git2 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
