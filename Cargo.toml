@@ -2,6 +2,7 @@
 name = "git-submodule-commitmsg-rs"
 version = "0.0.1"
 authors = ["Scott Talbot <s@chikachow.org>"]
+edition = "2018"
 
 [dependencies]
 git2 = "0.11"
