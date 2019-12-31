@@ -26,10 +26,18 @@ impl<'a> SubmoduleUpdate {
 
         let mut message_lines = std::vec::Vec::<String>::new();
         for commit in added_commits {
-            message_lines.push(format!("+{} {}", commit.id, commit.title));
+            let mut message_line = format!("+{}", commit.id);
+            if let Some(commit_title) = commit.title {
+                message_line.push_str(&format!(" {}", commit_title));
+            }
+            message_lines.push(message_line);
         }
         for commit in dropped_commits {
-            message_lines.push(format!("-{} {}", commit.id, commit.title));
+            let mut message_line = format!("-{}", commit.id);
+            if let Some(commit_title) = commit.title {
+                message_line.push_str(&format!(" {}", commit_title));
+            }
+            message_lines.push(message_line);
         }
 
         SubmoduleUpdate {
@@ -142,7 +150,7 @@ fn test_adding_one_commit() {
         "name",
         "from",
         "to",
-        vec![SubmoduleCommit::new("0000000", "commit")],
+        vec![SubmoduleCommit::new("0000000", Some("commit".to_owned()))],
         vec![],
     );
 
@@ -152,13 +160,28 @@ fn test_adding_one_commit() {
 }
 
 #[test]
+fn test_adding_one_commit_without_a_title() {
+    let update = SubmoduleUpdate::new(
+        "name",
+        "from",
+        "to",
+        vec![SubmoduleCommit::new("0000000", None)],
+        vec![],
+    );
+
+    assert_eq!(update.name, "name");
+    assert_eq!(update.title, "name (from..to)");
+    assert_eq!(update.message, Some("+0000000".to_owned()));
+}
+
+#[test]
 fn test_dropping_one_commit() {
     let update = SubmoduleUpdate::new(
         "name",
         "from",
         "to",
         vec![],
-        vec![SubmoduleCommit::new("0000000", "commit")],
+        vec![SubmoduleCommit::new("0000000", Some("commit".to_owned()))],
     );
 
     assert_eq!(update.name, "name");
@@ -172,8 +195,8 @@ fn test_adding_and_dropping_one_commit() {
         "name",
         "from",
         "to",
-        vec![SubmoduleCommit::new("0000000", "commit")],
-        vec![SubmoduleCommit::new("0000000", "commit")],
+        vec![SubmoduleCommit::new("0000000", Some("commit".to_owned()))],
+        vec![SubmoduleCommit::new("0000000", Some("commit".to_owned()))],
     );
 
     assert_eq!(update.name, "name");
