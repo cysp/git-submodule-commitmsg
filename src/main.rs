@@ -47,6 +47,10 @@ fn main() {
         })
         .collect();
 
+    if submodule_updates.len() == 0 {
+        return;
+    }
+
     let mut title = String::new();
     for submodule in submodule_updates.iter() {
         let title_component = submodule.get_title();
@@ -54,10 +58,6 @@ fn main() {
             title.push_str(", ");
         }
         title.push_str(&**title_component);
-    }
-
-    if submodule_updates.len() == 0 {
-        return;
     }
 
     println!("Update {}", title);
