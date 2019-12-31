@@ -42,7 +42,7 @@ impl<'a> SubmoduleUpdate {
 
         SubmoduleUpdate {
             name: name.to_owned(),
-            title: title,
+            title,
             message: if message_lines.is_empty() {
                 None
             } else {
@@ -55,7 +55,7 @@ impl<'a> SubmoduleUpdate {
         let path = submodule.path();
         let name = path
             .to_str()
-            .or(submodule.name())
+            .or_else(|| submodule.name())
             .unwrap_or("???")
             .to_owned();
 
@@ -78,9 +78,9 @@ impl<'a> SubmoduleUpdate {
         }
 
         let id_from_str = short_id_for_commit_in_repo(&submodule_repo, current_id)
-            .unwrap_or("???????".to_owned());
-        let id_to_str =
-            short_id_for_commit_in_repo(&submodule_repo, new_id).unwrap_or("???????".to_owned());
+            .unwrap_or_else(|_| "???????".to_owned());
+        let id_to_str = short_id_for_commit_in_repo(&submodule_repo, new_id)
+            .unwrap_or_else(|_| "???????".to_owned());
 
         let mut added_commits: Vec<SubmoduleCommit> = vec![];
         let mut dropped_commits: Vec<SubmoduleCommit> = vec![];
