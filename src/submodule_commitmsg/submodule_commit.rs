@@ -7,6 +7,12 @@ pub struct SubmoduleCommit {
 }
 
 impl SubmoduleCommit {
+    pub fn new(id: &str, title: &str) -> SubmoduleCommit {
+        SubmoduleCommit {
+            id: id.to_owned(),
+            title: title.to_owned(),
+        }
+    }
     pub fn from_repository_oid(
         r: &git2::Repository,
         oid: git2::Oid,
