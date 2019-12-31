@@ -3,9 +3,9 @@ use super::SubmoduleCommit;
 
 #[derive(Debug)]
 pub struct SubmoduleUpdate {
-    name: std::string::String,
-    title: std::string::String,
-    message: Option<std::string::String>,
+    pub name: std::string::String,
+    pub title: std::string::String,
+    pub message: Option<std::string::String>,
 }
 
 impl<'a> SubmoduleUpdate {
@@ -124,17 +124,5 @@ impl<'a> SubmoduleUpdate {
             added_commits,
             dropped_commits,
         ))
-    }
-
-    pub fn get_name(&self) -> &std::string::String {
-        &self.name
-    }
-
-    pub fn get_title(&self) -> &std::string::String {
-        &self.title
-    }
-
-    pub fn get_message(&self) -> Option<std::string::String> {
-        self.message.clone()
     }
 }
