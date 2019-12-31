@@ -7,7 +7,7 @@ use submodule_commitmsg::SubmoduleUpdate;
 
 fn main() {
     let mut args = std::env::args();
-    let argv0 = args.next().unwrap_or(String::new());
+    let argv0 = args.next().unwrap_or_default();
     let filenames = args.collect::<Vec<String>>();
 
     let p = Path::new(".");
@@ -41,8 +41,12 @@ fn main() {
         .iter()
         .filter_map(|submodule| {
             let path = submodule.path();
-            let name = path.to_str().or(submodule.name()).unwrap_or("").to_owned();
-            if filenames.len() > 0 && !filenames.contains(&name) {
+            let name = path
+                .to_str()
+                .or_else(|| submodule.name())
+                .unwrap_or("")
+                .to_owned();
+            if !filenames.is_empty() && !filenames.contains(&name) {
                 return None;
             }
             SubmoduleUpdate::from_submodule(submodule)
