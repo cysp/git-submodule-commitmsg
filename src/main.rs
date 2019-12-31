@@ -53,6 +53,15 @@ fn main() {
         return;
     }
 
+    let title = commit_title_from_submodule_updates(&submodule_updates);
+    let message = commit_message_from_submodule_updates(&submodule_updates);
+
+    print!("Update {}\n\n{}", title, message);
+}
+
+fn commit_title_from_submodule_updates(
+    submodule_updates: &[SubmoduleUpdate],
+) -> std::string::String {
     let mut title = String::new();
     for submodule in submodule_updates.iter() {
         let title_component = &submodule.title;
@@ -61,21 +70,28 @@ fn main() {
         }
         title.push_str(&title_component);
     }
+    title
+}
 
-    println!("Update {}", title);
+fn commit_message_from_submodule_updates(
+    submodule_updates: &[SubmoduleUpdate],
+) -> std::string::String {
+    let mut message = String::new();
 
     let multiple_updates = submodule_updates.len() > 1;
 
     for submodule in submodule_updates.iter() {
-        match &submodule.message {
-            Some(message) => {
-                println!("");
-                if multiple_updates {
-                    println!("{}:", submodule.name);
-                }
-                println!("{}", message)
+        if !message.is_empty() {
+            message.push_str("\n");
+        }
+
+        if let Some(submodule_message) = &submodule.message {
+            if multiple_updates {
+                message.push_str(&format!("{}:\n", submodule.name));
             }
-            None => (),
+            message.push_str(&format!("{}\n", submodule_message));
         }
     }
+
+    message
 }
