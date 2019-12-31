@@ -10,9 +10,9 @@ pub struct SubmoduleUpdate {
 
 impl<'a> SubmoduleUpdate {
     pub fn new(
-        name: std::string::String,
-        from_id: std::string::String,
-        to_id: std::string::String,
+        name: &str,
+        from_id: &str,
+        to_id: &str,
         added_commits: Vec<SubmoduleCommit>,
         dropped_commits: Vec<SubmoduleCommit>,
     ) -> SubmoduleUpdate {
@@ -33,7 +33,7 @@ impl<'a> SubmoduleUpdate {
         }
 
         SubmoduleUpdate {
-            name: name,
+            name: name.to_owned(),
             title: title,
             message: if message_lines.is_empty() {
                 None
@@ -118,9 +118,9 @@ impl<'a> SubmoduleUpdate {
         }
 
         Some(Self::new(
-            name,
-            id_from_str,
-            id_to_str,
+            &name,
+            &id_from_str,
+            &id_to_str,
             added_commits,
             dropped_commits,
         ))
