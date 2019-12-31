@@ -165,7 +165,7 @@ fn test_adding_one_commit_without_a_title() {
         "name",
         "from",
         "to",
-        vec![SubmoduleCommit::new("0000000", None)],
+        vec![SubmoduleCommit::new("0000000", None as Option<&str>)],
         vec![],
     );
 
