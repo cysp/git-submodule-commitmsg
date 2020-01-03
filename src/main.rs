@@ -1,8 +1,6 @@
-extern crate git2;
 mod submodule_commitmsg;
 
 use std::io::Write;
-use std::path::Path;
 use submodule_commitmsg::SubmoduleUpdate;
 
 fn main() {
@@ -10,8 +8,8 @@ fn main() {
     let argv0 = args.next().unwrap_or_default();
     let filenames = args.collect::<Vec<String>>();
 
-    let p = Path::new(".");
-    let r: git2::Repository = match git2::Repository::discover(&p) {
+    let p = std::path::Path::new(".");
+    let r = match git2::Repository::discover(&p) {
         Ok(r) => r,
         Err(e) => {
             let _ = writeln!(
