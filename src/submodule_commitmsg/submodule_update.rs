@@ -60,7 +60,7 @@ impl<'a> SubmoduleUpdate {
             .to_owned();
 
         let current_id = submodule.head_id()?;
-        let new_id = submodule.workdir_id()?;
+        let new_id = submodule.index_id()?;
 
         if current_id == new_id {
             return None;
