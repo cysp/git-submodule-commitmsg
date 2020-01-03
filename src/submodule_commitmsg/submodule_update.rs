@@ -59,23 +59,14 @@ impl<'a> SubmoduleUpdate {
             .unwrap_or("???")
             .to_owned();
 
-        let submodule_repo = match submodule.open() {
-            Ok(repo) => repo,
-            Err(_) => return None,
-        };
-
-        let current_id = match submodule.head_id() {
-            Some(id) => id,
-            None => return None,
-        };
-        let new_id = match submodule.workdir_id() {
-            Some(id) => id,
-            None => return None,
-        };
+        let current_id = submodule.head_id()?;
+        let new_id = submodule.workdir_id()?;
 
         if current_id == new_id {
             return None;
         }
+
+        let submodule_repo = submodule.open().ok()?;
 
         let id_from_str = short_id_for_commit_in_repo(&submodule_repo, current_id)
             .unwrap_or_else(|_| "???????".to_owned());
