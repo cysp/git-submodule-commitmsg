@@ -77,41 +77,37 @@ impl<'a> SubmoduleUpdate {
         let mut dropped_commits: Vec<SubmoduleCommit> = vec![];
 
         if let Ok(r) = git2::Repository::open(&path) {
-            let mut walk = match r.revwalk() {
-                Ok(rw) => rw,
-                Err(_) => return None,
-            };
-            walk.set_sorting(git2::Sort::TOPOLOGICAL);
+            if let Ok(mut walk) = r.revwalk() {
+                walk.set_sorting(git2::Sort::TOPOLOGICAL);
 
-            let _ = walk.hide(current_id);
-            let _ = walk.push(new_id);
-            for oid in walk {
-                let oid = match oid {
-                    Ok(oid) => oid,
-                    Err(_) => continue,
-                };
+                let _ = walk.hide(current_id);
+                let _ = walk.push(new_id);
+                for oid in walk {
+                    let oid = match oid {
+                        Ok(oid) => oid,
+                        Err(_) => continue,
+                    };
 
-                if let Ok(commit) = SubmoduleCommit::from_repository_oid(&r, oid) {
-                    added_commits.push(commit);
+                    if let Ok(commit) = SubmoduleCommit::from_repository_oid(&r, oid) {
+                        added_commits.push(commit);
+                    }
                 }
             }
 
-            let mut walk = match r.revwalk() {
-                Ok(rw) => rw,
-                Err(_) => return None,
-            };
-            walk.set_sorting(git2::Sort::TOPOLOGICAL);
+            if let Ok(mut walk) = r.revwalk() {
+                walk.set_sorting(git2::Sort::TOPOLOGICAL);
 
-            let _ = walk.hide(new_id);
-            let _ = walk.push(current_id);
-            for oid in walk {
-                let oid = match oid {
-                    Ok(oid) => oid,
-                    Err(_) => continue,
-                };
+                let _ = walk.hide(new_id);
+                let _ = walk.push(current_id);
+                for oid in walk {
+                    let oid = match oid {
+                        Ok(oid) => oid,
+                        Err(_) => continue,
+                    };
 
-                if let Ok(commit) = SubmoduleCommit::from_repository_oid(&r, oid) {
-                    dropped_commits.push(commit);
+                    if let Ok(commit) = SubmoduleCommit::from_repository_oid(&r, oid) {
+                        dropped_commits.push(commit);
+                    }
                 }
             }
         }
