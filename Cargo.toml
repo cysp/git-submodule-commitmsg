@@ -5,4 +5,4 @@ authors = ["Scott Talbot <s@chikachow.org>"]
 edition = "2018"
 
 [dependencies]
-git2 = "0.15"
+git2 = "0.16"
