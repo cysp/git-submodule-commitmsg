@@ -25,7 +25,7 @@ impl SubmoduleCommit {
         let title = r
             .find_commit(oid)
             .ok()
-            .and_then({ |c| c.message().map(|cm| cm.to_owned()) })
+            .and_then({ |c| c.message().ok().map(|cm| cm.to_owned()) })
             .and_then({ |cm| cm.split('\n').nth(0).map(|ct| ct.to_owned()) });
 
         Ok(SubmoduleCommit::new(&id, title))

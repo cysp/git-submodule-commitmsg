@@ -7,7 +7,7 @@ pub fn short_id_for_commit_in_repo(
         .short_id()?
         .as_str()
     {
-        Some(str) => Ok(str.to_owned()),
-        None => Err(git2::Error::from_str("")),
+        Ok(str) => Ok(str.to_owned()),
+        Err(_) => Err(git2::Error::from_str("")),
     }
 }
