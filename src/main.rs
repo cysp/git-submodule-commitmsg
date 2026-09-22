@@ -41,7 +41,7 @@ fn main() {
             let path = submodule.path();
             let name = path
                 .to_str()
-                .or_else(|| submodule.name())
+                .or_else(|| submodule.name().ok())
                 .unwrap_or("")
                 .to_owned();
             if !filenames.is_empty() && !filenames.contains(&name) {
